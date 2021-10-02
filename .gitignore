@@ -1,0 +1,13 @@
+#dependencies
+/client/node_modules/*
+
+#misc
+/.idea/
+npm-debug.log*
+.vscode/
+
+#NOT CONFIRM
+package-lock.json
+npm-debug.log
+debug.log
+debug.log~6547c670dafccc20a25facc4c15d02342146d4fb
