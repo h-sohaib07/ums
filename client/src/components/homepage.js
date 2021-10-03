@@ -1,48 +1,56 @@
 import React, { Component } from 'react'
 import Header from './header'
 import { NavLink } from 'react-router-dom';
+import axios from 'axios'
+
 export default class homepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             users: [],
+            page: 1,
+            totalPages: 0
         };
     }
-
-    componentDidMount() {
-        let data = [
-            {
-                id: "1",
-                firstName: "Sohaib",
-                lastName: "Hassan",
-                DOB: "15-02-1996"
-            },
-            {
-                id: "2",
-                firstName: "Jon",
-                lastName: "Doe",
-                DOB: "15-02-2001"
-            },
-            {
-                id: "3",
-                firstName: "Steven",
-                lastName: "Haws",
-                DOB: "15-02-1976"
-            }
-        ]
-        this.setState({ users: data })
+    componentWillMount() {
+        this.getPageData(this.state.page)
     }
-    getAge = (DOB) => {
 
+    getPageData = (pageNumber) => {
+        this.setState({ page: pageNumber })
+        axios
+            .get(`http://localhost/ums-server/getUsers.php?page=${pageNumber}`)
+            .then((response) => {
+                if (response.data.success === 200) {
+                    this.setState({ users: response.data.users, totalPages: response.data.totalPages })
+                }
+            })
+    }
+    getAge = (dateString) => {
+        var today = new Date();
+        var birthDate = new Date(dateString);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
     }
     deleteUser = (id) => {
-        console.log(id)
-        let users = this.state.users.filter((user, index) => (
-            user.id !== id
-        ))
-        this.setState({ users: users })
+        axios
+            .post(`http://localhost/ums-server/deleteUser.php`, {
+                id: id
+            })
+            .then((response) => {
+                console.log(response.data)
+                if (response.data.success === 200) {
+                    this.getPageData(this.state.page)
+                }
+            })
+
     }
     render() {
+        const { totalPages } = this.state
         return (
             <>
                 <Header />
@@ -65,12 +73,19 @@ export default class homepage extends Component {
                             {
                                 this.state.users.length > 0 && this.state.users.map((user, index) => (
                                     <tr key={index}>
-                                        <td>{user.id}</td>
-                                        <td>{user.firstName}</td>
-                                        <td>{user.lastName}</td>
-                                        <td>{user.DOB}</td>
-                                        <td><NavLink className='btn btn-info btn-xs' to="/edituser">Edit</NavLink></td>
-                                        <td><button className='btn btn-danger btn-xs' onClick={() => this.deleteUser(user.id)}>Delete</button></td>
+                                        <td>{user.Id}</td>
+                                        <td>{user.FirstName}</td>
+                                        <td>{user.LastName}</td>
+                                        <td>{this.getAge(user.Birthday)}</td>
+                                        <td>
+                                            <NavLink className='btn btn-info btn-xs'
+                                                to={{
+                                                    pathname: "/edituser",
+                                                    user: user
+                                                }}
+                                            >Edit</NavLink>
+                                        </td>
+                                        <td><button className='btn btn-danger btn-xs' onClick={() => this.deleteUser(user.Id)}>Delete</button></td>
                                     </tr>
                                 ))
                             }
@@ -80,15 +95,15 @@ export default class homepage extends Component {
 
                     <nav aria-label="...">
                         <ul className="pagination justify-content-center">
-                            <li className="page-item">
-                                <NavLink className="page-link" to="#" tabIndex="-1">1</NavLink>
-                            </li>
-                            <li className="page-item">
-                                <NavLink className="page-link" to="#">2</NavLink>
-                            </li>
-                            <li className="page-item">
-                                <NavLink className="page-link" to="#">3</NavLink>
-                            </li>
+                            {console.log(totalPages, "totalPages")}
+                            {
+                                totalPages > 0 && Array(totalPages).fill(null).map((value, index) => (
+                                    <li className="page-item">
+                                        <button className="page-link" onClick={() => this.getPageData(index + 1)} tabIndex="-1">{index + 1}</button>
+                                    </li>
+                                ))
+                            }
+
                         </ul>
                     </nav>
                 </div>

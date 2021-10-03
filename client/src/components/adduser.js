@@ -1,29 +1,33 @@
 import React, { Component } from 'react'
 import Header from './header'
-
+import axios from 'axios'
 export default class adduser extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loader: false,
-            userAdded: false
+            loader: false
         };
     }
     render() {
         const addUser = (e) => {
             e.preventDefault()
             console.log(e)
-
+            let that = this
             let firstName = e.target.firstName.value
             let lastName = e.target.lastName.value
             let birthday = e.target.birthday.value
-            this.setState({ loader: true }, () => {
-                this.setState({ userAdded: true })
-                setTimeout(() => {
-                    this.props.history.push("/")
-                }, 5000)
-            })
-
+            this.setState({ loader: true })
+            axios
+                .post("http://localhost/ums-server/addUser.php", {
+                    firstName: firstName,
+                    lastName: lastName,
+                    birthday: birthday,
+                })
+                .then(function (response) {
+                    if (response.data.success === 200) {
+                        that.props.history.push("/")
+                    }
+                })
         }
         const goBack = () => {
             this.props.history.push("/")
@@ -54,13 +58,6 @@ export default class adduser extends Component {
                             </div>
 
                         </div>
-                        {this.state.userAdded &&
-                            <div className="col-auto">
-                                <div class="alert alert-primary" role="alert">
-                                    You have added a user successfully !!
-                                </div>
-                            </div>
-                        }
                     </form>
 
                 </div>
