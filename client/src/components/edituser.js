@@ -7,6 +7,7 @@ export default class adduser extends Component {
         console.log(props)
         super(props);
         this.state = {
+            loader: false,
             firstName: "",
             lastName: "",
             birthday: ""
@@ -49,7 +50,11 @@ export default class adduser extends Component {
                 })
                 .then(function (response) {
                     if (response.data.success === 200) {
-                        that.props.history.push("/")
+                        that.setState({ userAdded: true }, () => {
+                            setTimeout(() => {
+                                that.props.history.push("/")
+                            }, 3000)
+                        })
                     }
                 })
         }
@@ -79,9 +84,14 @@ export default class adduser extends Component {
                                 <input type="button" value="Cancel" onClick={() => goBack()} className="btn btn-light mb-3" />
                             </div>
                             <div className="col-auto">
-                                <button type="submit" className="btn btn-primary mb-3">Edit</button>
+                                <button type="submit" className="btn btn-primary mb-3" disabled={this.state.loader ? true : false}>Edit</button>
                             </div>
                         </div>
+                        {this.state.userAdded &&
+                            <div className="alert alert-success" role="alert">
+                                You have edit a user successfully !!
+                            </div>
+                        }
                     </form>
                 </div>
 

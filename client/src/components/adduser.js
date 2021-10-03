@@ -5,7 +5,8 @@ export default class adduser extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loader: false
+            loader: false,
+            userAdded: false
         };
     }
     render() {
@@ -25,7 +26,11 @@ export default class adduser extends Component {
                 })
                 .then(function (response) {
                     if (response.data.success === 200) {
-                        that.props.history.push("/")
+                        that.setState({ userAdded: true }, () => {
+                            setTimeout(() => {
+                                that.props.history.push("/")
+                            }, 4000)
+                        })
                     }
                 })
         }
@@ -56,9 +61,14 @@ export default class adduser extends Component {
                             <div className="col-auto">
                                 <button type="submit" className="btn btn-primary mb-3" disabled={this.state.loader ? true : false}>Add</button>
                             </div>
-
                         </div>
+                        {this.state.userAdded &&
+                            <div className="alert alert-success" role="alert">
+                                You have added a user successfully !!
+                            </div>
+                        }
                     </form>
+
 
                 </div>
             </>
