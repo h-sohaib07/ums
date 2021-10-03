@@ -22,6 +22,7 @@ export default class homepage extends Component {
             .get(`http://localhost/ums-server/getUsers.php?page=${pageNumber}`)
             .then((response) => {
                 if (response.data.success === 200) {
+                    this.props.history.push(`/homepage/${pageNumber}`)
                     this.setState({ users: response.data.users, totalPages: response.data.totalPages })
                 }
             })
@@ -95,7 +96,6 @@ export default class homepage extends Component {
 
                     <nav aria-label="...">
                         <ul className="pagination justify-content-center">
-                            {console.log(totalPages, "totalPages")}
                             {
                                 totalPages > 0 && Array(totalPages).fill(null).map((value, index) => (
                                     <li className="page-item">
