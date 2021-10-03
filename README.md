@@ -18,3 +18,13 @@ FOR CLIENT:
 
 2- Run "npm start" command in that folder thorugh terminal
 
+
+FOR DATABASE:
+
+1- Import mysql file "Dump20211003" in mysql database tool like mysql workbench
+
+username: root
+
+password: 1234
+
+schema: ums
